@@ -1,0 +1,25 @@
+{
+  "example.com": {
+    "A": ["93.184.216.34"],
+    "AAAA": ["2606:2800:220:1:248:1893:25c8:1946"],
+    "MX": [[10, "mail.example.com"]],
+    "TXT": ["v=spf1 -all"]
+  },
+  "www.example.com": {
+    "CNAME": ["example.com"]
+  },
+  "mail.example.com": {
+    "A": ["93.184.216.35"]
+  },
+  "toylab.dev": {
+    "A": ["10.0.0.1", "10.0.0.2"],
+    "NS": ["ns1.toylab.dev"]
+  },
+  "ns1.toylab.dev": {
+    "A": ["10.0.0.53"]
+  },
+  "api.toylab.dev": {
+    "A": ["10.0.0.10"],
+    "TXT": ["hello from the toy zone"]
+  }
+}
