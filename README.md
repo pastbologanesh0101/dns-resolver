@@ -121,8 +121,8 @@ covering wire-format round trips, name compression, each supported record
 type, successful resolution, NXDOMAIN, timeouts (against a closed local
 port), and malformed-packet handling (the server must keep running).
 
-CI (`.github/workflows/tests.yml`) runs the same suite on Python 3.11 and
-3.12 on every push and pull request.
+CI (`.github/workflows/tests.yml`) runs the same suite on Python 3.11,
+3.12, and 3.13 on every push and pull request.
 
 ## Troubleshooting / FAQ
 
