@@ -35,7 +35,7 @@ from resolver import (
 )
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="From-scratch DNS resolver CLI")
     parser.add_argument("name", help="Domain name to resolve, e.g. example.com")
     parser.add_argument(

@@ -58,7 +58,7 @@ def load_zone(path: str) -> Dict[str, Dict[str, list]]:
     return zone
 
 
-def _build_record(name: str, rtype: int, value) -> DNSRecord:
+def _build_record(name: str, rtype: int, value: object) -> DNSRecord:
     if rtype == TYPE_MX:
         preference, exchange = value
         rdata = (preference, exchange)
@@ -129,7 +129,7 @@ class ToyDNSServer:
         response.answers = answers
         return response
 
-    def _serve_forever(self):
+    def _serve_forever(self) -> None:
         assert self._sock is not None
         self._sock.settimeout(0.5)
         while self._running.is_set():
@@ -152,7 +152,7 @@ class ToyDNSServer:
                 sys.stderr.write(f"[server] unexpected error handling packet from {addr}: {e}\n")
                 continue
 
-    def start(self):
+    def start(self) -> None:
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._sock.bind((self.host, self.port))
@@ -162,14 +162,14 @@ class ToyDNSServer:
         self._thread = threading.Thread(target=self._serve_forever, daemon=True)
         self._thread.start()
 
-    def stop(self):
+    def stop(self) -> None:
         self._running.clear()
         if self._thread is not None:
             self._thread.join(timeout=2)
         if self._sock is not None:
             self._sock.close()
 
-    def wait_forever(self):
+    def wait_forever(self) -> None:
         try:
             while self._thread is not None and self._thread.is_alive():
                 self._thread.join(timeout=0.5)
@@ -177,7 +177,7 @@ class ToyDNSServer:
             self.stop()
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Toy authoritative DNS server")
     parser.add_argument("--port", type=int, default=5353, help="UDP port to listen on (default 5353)")
     parser.add_argument("--host", default="127.0.0.1", help="Host/IP to bind (default 127.0.0.1)")
