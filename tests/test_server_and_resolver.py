@@ -16,6 +16,7 @@ from dns_protocol import DNSMessage, TYPE_A, TYPE_MX, TYPE_TXT
 from resolver import (
     DNSTimeoutError,
     NXDomainError,
+    parse_server_arg,
     query_server,
     resolve,
 )
@@ -105,6 +106,25 @@ class TestTimeoutHandling(unittest.TestCase):
 
         with self.assertRaises(DNSTimeoutError):
             resolve("example.com", qtype=TYPE_A, start_server="127.0.0.1", start_port=unused_port, timeout=0.5)
+
+
+class TestParseServerArg(unittest.TestCase):
+    def test_parse_server_arg_accepts_host_and_port(self):
+        self.assertEqual(parse_server_arg("127.0.0.1:5353"), ("127.0.0.1", 5353))
+
+    def test_parse_server_arg_defaults_port_for_bare_host(self):
+        self.assertEqual(parse_server_arg("127.0.0.1")[1], 53)
+
+    def test_parse_server_arg_rejects_non_numeric_port(self):
+        # A typo'd --server value should fail with a clear message rather
+        # than letting int() raise an unhelpful ValueError deep in argparse
+        # handling.
+        with self.assertRaises(ValueError):
+            parse_server_arg("127.0.0.1:notaport")
+
+    def test_parse_server_arg_rejects_out_of_range_port(self):
+        with self.assertRaises(ValueError):
+            parse_server_arg("127.0.0.1:99999")
 
 
 class TestMalformedPacketHandling(ToyServerTestCase):

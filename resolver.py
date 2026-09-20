@@ -79,10 +79,24 @@ class ResolvedAnswer:
 
 
 def parse_server_arg(server: str) -> Tuple[str, int]:
-    """Parse a "host:port" or bare "host" string into (host, port)."""
+    """Parse a "host:port" or bare "host" string into (host, port).
+
+    Raises ValueError with a specific, user-facing message if a port is
+    present but isn't a valid UDP port number (not an integer, or out of
+    the 0-65535 range) -- e.g. a typo like "127.0.0.1:53a" or a missing
+    host like ":5353".
+    """
     if ":" in server:
         host, port_str = server.rsplit(":", 1)
-        return host, int(port_str)
+        if not host:
+            raise ValueError(f"invalid --server value {server!r}: missing host before ':'")
+        try:
+            port = int(port_str)
+        except ValueError:
+            raise ValueError(f"invalid --server value {server!r}: {port_str!r} is not a valid port number")
+        if not (0 <= port <= 65535):
+            raise ValueError(f"invalid --server value {server!r}: port {port} is out of range (0-65535)")
+        return host, port
     return server, DEFAULT_PORT
 
 

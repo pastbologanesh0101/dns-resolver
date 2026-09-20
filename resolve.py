@@ -14,7 +14,7 @@ Exit codes:
     0  success (records printed)
     1  NXDOMAIN
     2  timeout
-    3  other resolver/query error
+    3  other resolver/query error, including a malformed --server value
 """
 
 from __future__ import annotations
@@ -52,7 +52,11 @@ def main():
     parser.add_argument("--timeout", type=float, default=3.0, help="Query timeout in seconds (default 3)")
     args = parser.parse_args()
 
-    host, port = parse_server_arg(args.server)
+    try:
+        host, port = parse_server_arg(args.server)
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(3)
     qtype = NAME_TO_TYPE[args.type]
 
     try:
