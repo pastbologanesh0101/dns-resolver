@@ -124,6 +124,45 @@ port), and malformed-packet handling (the server must keep running).
 CI (`.github/workflows/tests.yml`) runs the same suite on Python 3.11 and
 3.12 on every push and pull request.
 
+## Troubleshooting / FAQ
+
+**I get a `TIMEOUT` instead of `NXDOMAIN` — what's the difference?**
+They mean different things and it's worth not confusing them. `NXDOMAIN`
+means a server *responded* and authoritatively said the name doesn't
+exist. `TIMEOUT` means nothing answered at all within `--timeout` seconds
+— wrong host/port, a firewall dropping the UDP packet, or the toy server
+not actually running. Since DNS-over-UDP is connectionless, the client
+has no way to distinguish "no such server" from "server is slow" from
+"reply got lost in transit" — they all look like silence, so `resolve.py`
+reports them all as `TIMEOUT` (exit code 2). If you're expecting
+`NXDOMAIN` and getting `TIMEOUT` instead, double check `--server` points
+at a server that's actually listening (`python server.py --port ...`
+must be running first).
+
+**Why doesn't the referral-following code path ever seem to run against the default server?**
+Pointing `resolve.py` at a real public resolver like `1.1.1.1:53` (the
+default) or at our own `server.py` both return final, direct answers —
+a real public resolver does its own recursion internally and only hands
+you the finished result, and our toy server is authoritative for
+everything it knows, so it never emits a referral either. The
+NS/glue-referral-following loop in `resolver.py`'s `resolve()` is real,
+tested code, but you'd only see it actually take a hop if you ran two
+toy servers and configured one to refer to the other, which the test
+suite deliberately doesn't set up (see Limitations below).
+
+**Why do I get raw bytes instead of a readable value for some record?**
+`dns_protocol.py` only interprets A, AAAA, CNAME, NS, MX, and TXT rdata.
+Any other RTYPE it encounters while decoding (e.g. SOA, SRV, PTR) is
+returned as the raw RDATA bytes rather than raising, so the message still
+parses instead of crashing — it's just up to the caller to know what to
+do with those bytes. Extending `_decode_rdata()` for a new type is a good
+first contribution (see `CONTRIBUTING.md`).
+
+**`server.py` fails with `OSError: [Errno 48] Address already in use`.**
+Something (often a previous, still-running `server.py`) is already bound
+to that UDP port. Pick a different `--port`, or find and stop the
+existing process.
+
 ## Limitations
 
 This is a learning/portfolio project, not a production resolver: no
