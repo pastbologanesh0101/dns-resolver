@@ -1,9 +1,22 @@
 # DNS Resolver
 
+[![tests](https://github.com/pastbologanesh0101/dns-resolver/actions/workflows/tests.yml/badge.svg)](https://github.com/pastbologanesh0101/dns-resolver/actions/workflows/tests.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A DNS resolver and toy authoritative DNS server, both built from scratch in
 pure Python: raw UDP sockets (`socket`) and hand-rolled DNS wire-format
 encoding/decoding (`struct`). No `dnspython` or any other DNS library is
 used — parsing the packet format by hand is the whole point of the project.
+
+## Contents
+
+- [What's in here](#whats-in-here)
+- [DNS wire format, briefly](#dns-wire-format-briefly)
+- [How the resolver and toy server work together](#how-the-resolver-and-toy-server-work-together)
+- [Running the demo](#running-the-demo)
+- [Running the tests](#running-the-tests)
+- [Troubleshooting / FAQ](#troubleshooting--faq)
+- [Limitations](#limitations)
 
 ## What's in here
 
