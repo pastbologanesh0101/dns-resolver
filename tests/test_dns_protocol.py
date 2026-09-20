@@ -60,6 +60,14 @@ class TestNameEncoding(unittest.TestCase):
         with self.assertRaises(DNSFormatError):
             decode_name(packet, 0)
 
+    def test_encode_name_rejects_label_over_63_bytes(self):
+        # RFC 1035 caps each label at 63 bytes; a longer label must be
+        # rejected at encode time rather than silently producing an
+        # unparsable packet.
+        too_long_label = "a" * 64
+        with self.assertRaises(DNSFormatError):
+            encode_name(f"{too_long_label}.com")
+
 
 class TestHeaderRoundTrip(unittest.TestCase):
     def test_header_pack_unpack_round_trip(self):

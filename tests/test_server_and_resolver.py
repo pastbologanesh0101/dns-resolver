@@ -56,6 +56,15 @@ class TestToyServerAnswers(ToyServerTestCase):
         self.assertEqual(len(answers), 1)
         self.assertEqual(answers[0].value, (10, "mail.example.com"))
 
+    def test_nodata_for_existing_name_without_requested_type(self):
+        # "toylab.dev" exists in the zone (A + NS records) but has no MX
+        # records. A real authoritative server answers NOERROR with an
+        # empty answer section here (DNS "NODATA"), which is distinct from
+        # NXDOMAIN -- the resolver must return an empty list rather than
+        # raising.
+        answers = resolve("toylab.dev", qtype=TYPE_MX, start_server="127.0.0.1", start_port=self.port, timeout=2.0)
+        self.assertEqual(answers, [])
+
     def test_resolves_txt_record(self):
         answers = resolve("api.toylab.dev", qtype=TYPE_TXT, start_server="127.0.0.1", start_port=self.port, timeout=2.0)
         self.assertEqual(answers[0].value, "hello from the toy zone")
