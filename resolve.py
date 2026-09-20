@@ -8,6 +8,7 @@ CLI for the from-scratch DNS resolver.
 Usage:
     python resolve.py example.com --server 127.0.0.1:5353
     python resolve.py example.com --type MX --server 127.0.0.1:5353
+    python resolve.py example.com --short --server 127.0.0.1:5353  # values only
     python resolve.py example.com                      # uses default public resolver
 
 Exit codes:
@@ -50,6 +51,12 @@ def main():
              "Point this at your toy server, e.g. 127.0.0.1:5353",
     )
     parser.add_argument("--timeout", type=float, default=3.0, help="Query timeout in seconds (default 3)")
+    parser.add_argument(
+        "--short",
+        action="store_true",
+        help="Print only the resolved values, one per line, with no name/ttl/type "
+             "columns or summary line -- convenient for scripting (like `dig +short`).",
+    )
     args = parser.parse_args()
 
     try:
@@ -70,6 +77,11 @@ def main():
     except DNSQueryError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(3)
+
+    if args.short:
+        for ans in answers:
+            print(ans.value)
+        return
 
     if not answers:
         print(f"No {args.type} records found for {args.name} (NOERROR, no data)")

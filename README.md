@@ -106,7 +106,14 @@ Resolved www.example.com (A) via 127.0.0.1:5353:
 
 $ python resolve.py nosuchdomain.invalid --server 127.0.0.1:5353
 NXDOMAIN: nosuchdomain.invalid does not exist (NXDOMAIN)
+
+$ python resolve.py example.com --server 127.0.0.1:5353 --short
+93.184.216.34
 ```
+
+`--short` prints just the resolved value(s), one per line, with no
+name/ttl/type columns or summary line — handy for scripting, similar to
+`dig +short`.
 
 ## Running the tests
 
